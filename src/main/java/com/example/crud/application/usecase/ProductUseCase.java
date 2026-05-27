@@ -3,8 +3,10 @@ package com.example.crud.application.usecase;
 import com.example.crud.domain.model.Product;
 import com.example.crud.domain.port.input.ProductService;
 import com.example.crud.domain.port.output.ProductRepository;
+import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 
+@ApplicationScoped
 public class ProductUseCase implements ProductService {
     private final ProductRepository repository;
 
@@ -17,7 +19,7 @@ public class ProductUseCase implements ProductService {
 
     @Override
     public Product getProduct(Long id) { 
-        return repository.findById(id).orElseThrow(() -> new RuntimeException("Product not found with id: " + id)); 
+        return repository.findById(id).orElseThrow(() -> new RuntimeException("Product not found: " + id)); 
     }
 
     @Override
