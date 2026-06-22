@@ -13,7 +13,7 @@ import java.util.List;
 @Path("/products")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@SecurityRequirement(name = "jwtAuth")
+@SecurityRequirement(name = "SecurityScheme")
 @Tag(name = "Product Resource", description = "Product management endpoints using Hexagonal Architecture")
 public class ProductResource {
     private final ProductService productService;

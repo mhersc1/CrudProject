@@ -12,7 +12,7 @@ import org.eclipse.microprofile.openapi.annotations.security.SecuritySchemes;
 )
 @SecuritySchemes({
         @SecurityScheme(
-                securitySchemeName = "jwtAuth",
+                securitySchemeName = "SecurityScheme",
                 type = SecuritySchemeType.HTTP,
                 scheme = "bearer",
                 bearerFormat = "JWT",

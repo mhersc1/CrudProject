@@ -13,7 +13,7 @@ public class InMemoryUserRepository implements UserRepository {
     // In-memory representation acting as a basic database
     private static final Map<String, User> USERS = Map.of(
             "admin", new User("admin", "admin", Set.of("Admin", "User")),
-            "mher", new User("mher", "password", Set.of("User"))
+            "mher", new User("mher", "mher", Set.of("User"))
     );
 
     @Override

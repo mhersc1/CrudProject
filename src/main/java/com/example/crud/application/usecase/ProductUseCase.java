@@ -1,5 +1,6 @@
 package com.example.crud.application.usecase;
 
+import com.example.crud.domain.exception.ProductNotFoundException;
 import com.example.crud.domain.model.Product;
 import com.example.crud.domain.port.input.ProductService;
 import com.example.crud.domain.port.output.ProductRepository;
@@ -15,11 +16,17 @@ public class ProductUseCase implements ProductService {
     }
 
     @Override
-    public Product createProduct(Product product) { return repository.save(product); }
+    public Product createProduct(Product product) {
+        try {
+            return repository.save(product);
+        } catch (Exception e){
+            throw new ProductNotFoundException(product.id());
+        }
+    }
 
     @Override
     public Product getProduct(Long id) { 
-        return repository.findById(id).orElseThrow(() -> new RuntimeException("Product not found: " + id)); 
+        return repository.findById(id).orElseThrow(() -> new ProductNotFoundException(id));
     }
 
     @Override
