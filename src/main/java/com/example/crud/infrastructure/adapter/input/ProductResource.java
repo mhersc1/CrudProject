@@ -1,7 +1,7 @@
 package com.example.crud.infrastructure.adapter.input;
 
 import com.example.crud.domain.model.Product;
-import com.example.crud.domain.port.input.ProductService;
+import com.example.crud.application.port.input.ProductService;
 import jakarta.annotation.security.RolesAllowed;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
@@ -24,23 +24,40 @@ public class ProductResource {
 
     @POST
     @RolesAllowed("Admin")
-    @Operation(summary = "Create a product", description = "Stores a new product inside the in-memory H2 SQL database")
-    public Product create(Product product) { return productService.createProduct(product); }
+    @Operation(summary = "Create a product", description = "Stores a new product inside the in-memory storage. User-provided ID is ignored, auto-incremental ID is always used.")
+    public Product create(Product product) { 
+        // Repository now enforces auto-incremental IDs - user IDs are ignored
+        return productService.createProduct(product); 
+    }
 
     @GET
     @Path("/{id}")
     @RolesAllowed({"User", "Admin"})
-    @Operation(summary = "Find product by ID", description = "Retrieves a single product details from H2 storage")
-    public Product get(@PathParam("id") Long id) { return productService.getProduct(id); }
+    @Operation(summary = "Find product by ID", description = "Retrieves a single product details from in-memory storage")
+    public Product get(@PathParam("id") Long id) { 
+        return productService.getProduct(id); 
+    }
 
     @GET
     @RolesAllowed({"User", "Admin"})
-    @Operation(summary = "List all products", description = "Returns a comprehensive list of items available in the database")
-    public List<Product> getAll() { return productService.getAllProducts(); }
+    @Operation(summary = "List all products", description = "Returns a comprehensive list of items available in the in-memory storage")
+    public List<Product> getAll() { 
+        return productService.getAllProducts(); 
+    }
+
+    @PUT
+    @Path("/{id}")
+    @RolesAllowed("Admin")
+    @Operation(summary = "Update a product", description = "Updates an existing product in the in-memory storage")
+    public Product update(@PathParam("id") Long id, Product product) {
+        return productService.updateProduct(id, product);
+    }
 
     @DELETE
     @Path("/{id}")
     @RolesAllowed("Admin")
-    @Operation(summary = "Delete a product", description = "Permanently drops a product record by its database primary key")
-    public void delete(@PathParam("id") Long id) { productService.removeProduct(id); }
+    @Operation(summary = "Delete a product", description = "Permanently drops a product record by its ID from in-memory storage")
+    public void delete(@PathParam("id") Long id) { 
+        productService.removeProduct(id); 
+    }
 }

@@ -1,51 +1,70 @@
 package com.example.crud.infrastructure.adapter.output;
 
 import com.example.crud.domain.model.Product;
-import com.example.crud.domain.port.output.ProductRepository;
+import com.example.crud.application.port.output.ProductRepository;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.transaction.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * Pure in-memory implementation of ProductRepository.
+ * Uses no database, no persistence, no SQL - just memory storage.
+ * This is a true in-memory repository for testing and development.
+ */
 @ApplicationScoped
-public class InMemoryProductRepository implements ProductRepository { // <-- Removed "implements PanacheRepository"
+public class InMemoryProductRepository implements ProductRepository {
+    
+    // Thread-safe in-memory storage
+    private final Map<Long, Product> products = new ConcurrentHashMap<>();
+    
+    // Auto-generating ID sequence
+    private final AtomicLong idGenerator = new AtomicLong(1);
 
     @Override
-    @Transactional
     public Product save(Product product) {
-        // Map domain record to DB entity
-        ProductEntity entity = new ProductEntity(product.id(), product.name(), product.price());
-
-        if (entity.getId() == null) {
-            entity.persist(); // <-- Call persist directly on the entity instance
-        } else {
-            entity = ProductEntity.getEntityManager().merge(entity);
-        }
-
-        return new Product(entity.getId(), entity.getName(), entity.getPrice());
+        // ALWAYS use auto-incremental ID - ignore any user-provided ID
+        // This ensures consistent ID generation regardless of user input
+        Long id = idGenerator.getAndIncrement();
+        
+        // Create new product with auto-generated ID (ignore user's ID completely)
+        Product newProduct = new Product(id, product.name(), product.price());
+        
+        // Store in memory
+        products.put(id, newProduct);
+        
+        return newProduct;
     }
 
     @Override
     public Optional<Product> findById(Long id) {
-        // <-- Call static PanacheEntityBase method safely
-        return ProductEntity.<ProductEntity>findByIdOptional(id)
-                .map(entity -> new Product(entity.getId(), entity.getName(), entity.getPrice()));
+        return Optional.ofNullable(products.get(id));
     }
 
     @Override
     public List<Product> findAll() {
-        // <-- Call static listAll() from the entity class
-        return ProductEntity.<ProductEntity>listAll().stream()
-                .map(entity -> new Product(entity.getId(), entity.getName(), entity.getPrice()))
-                .collect(Collectors.toList());
+        return new ArrayList<>(products.values());
     }
 
     @Override
-    @Transactional
     public void deleteById(Long id) {
-        // <-- Call static delete from the entity class to bypass signature collision completely
-        ProductEntity.delete("id", id);
+        products.remove(id);
+    }
+    
+    /**
+     * Clears all products from memory.
+     * Useful for testing to get clean state.
+     */
+    public void clearAll() {
+        products.clear();
+        idGenerator.set(1); // Reset ID sequence
+    }
+    
+    /**
+     * Returns current count of products in memory.
+     */
+    public int count() {
+        return products.size();
     }
 }

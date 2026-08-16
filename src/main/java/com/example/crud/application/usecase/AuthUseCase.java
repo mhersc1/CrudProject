@@ -1,7 +1,7 @@
 package com.example.crud.application.usecase;
 
-import com.example.crud.domain.port.input.AuthService;
-import com.example.crud.domain.port.output.UserRepository;
+import com.example.crud.application.port.input.AuthService;
+import com.example.crud.application.port.output.UserRepository;
 import io.smallrye.jwt.build.Jwt;
 import jakarta.enterprise.context.ApplicationScoped;
 

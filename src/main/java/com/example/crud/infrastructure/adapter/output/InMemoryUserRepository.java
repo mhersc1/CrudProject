@@ -1,7 +1,7 @@
 package com.example.crud.infrastructure.adapter.output;
 
 import com.example.crud.domain.model.User;
-import com.example.crud.domain.port.output.UserRepository;
+import com.example.crud.application.port.output.UserRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.Map;

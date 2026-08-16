@@ -1,0 +1,87 @@
+# Generated GraphQL Schema for CrudProject
+
+type Product {
+  id: ID!
+  name: String!
+  price: Float!
+}
+
+type User {
+  username: String!
+  password: String!
+  roles: [String!]!
+}
+
+type ProductEdge {
+  cursor: String!
+  node: Product!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+}
+
+type ProductConnection {
+  edges: [ProductEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type ProductStats {
+  count: Int!
+  averagePrice: Float!
+  minPrice: Float!
+  maxPrice: Float!
+}
+
+input ProductFilter {
+  nameContains: String
+  priceMin: Float
+  priceMax: Float
+}
+
+input ProductSort {
+  field: ProductSortField
+  direction: SortDirection
+}
+
+input Pagination {
+  offset: Int = 0
+  limit: Int = 20
+}
+
+input ProductInput {
+  name: String!
+  price: Float!
+}
+
+enum ProductSortField {
+  ID
+  NAME
+  PRICE
+}
+
+enum SortDirection {
+  ASC
+  DESC
+}
+
+type Query {
+  product(id: ID!): Product
+  products: [Product!]!
+  productsWithFilter(filter: ProductFilter, sort: ProductSort, pagination: Pagination): ProductConnection!
+  me: User!
+  productStats(filter: ProductFilter): ProductStats!
+}
+
+type Mutation {
+  createProduct(input: ProductInput!): Product!
+  updateProduct(id: ID!, input: ProductInput!): Product!
+  deleteProduct(id: ID!): Boolean!
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+}
