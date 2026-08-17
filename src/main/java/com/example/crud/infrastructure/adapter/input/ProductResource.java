@@ -1,5 +1,6 @@
 package com.example.crud.infrastructure.adapter.input;
 
+import com.example.crud.domain.exception.ProductNotFoundException;
 import com.example.crud.domain.model.Product;
 import com.example.crud.application.port.input.ProductService;
 import jakarta.annotation.security.RolesAllowed;
@@ -34,7 +35,7 @@ public class ProductResource {
     @Path("/{id}")
     @RolesAllowed({"User", "Admin"})
     @Operation(summary = "Find product by ID", description = "Retrieves a single product details from in-memory storage")
-    public Product get(@PathParam("id") Long id) { 
+    public Product get(@PathParam("id") Long id) throws ProductNotFoundException {
         return productService.getProduct(id); 
     }
 
@@ -49,7 +50,7 @@ public class ProductResource {
     @Path("/{id}")
     @RolesAllowed("Admin")
     @Operation(summary = "Update a product", description = "Updates an existing product in the in-memory storage")
-    public Product update(@PathParam("id") Long id, Product product) {
+    public Product update(@PathParam("id") Long id, Product product) throws ProductNotFoundException {
         return productService.updateProduct(id, product);
     }
 

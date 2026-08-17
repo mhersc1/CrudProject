@@ -1,6 +1,7 @@
 package com.example.crud.infrastructure.adapter.input;
 
 import com.example.crud.application.usecase.GraphQLProductUseCase;
+import com.example.crud.domain.exception.ProductNotFoundException;
 import com.example.crud.domain.model.*;
 import com.example.crud.application.port.input.ProductService;
 import com.example.crud.infrastructure.adapter.input.graphql.*;
@@ -43,7 +44,7 @@ public class GraphQLResource {
     
     @Query
     @RolesAllowed({"User", "Admin"})
-    public Product product(@Name("id") Long id) {
+    public Product product(@Name("id") Long id) throws ProductNotFoundException {
         return productService.getProduct(id);
     }
     
@@ -78,14 +79,14 @@ public class GraphQLResource {
     
     @Mutation
     @RolesAllowed("Admin")
-    public Product createProduct(@Name("input") ProductInput input) {
+    public Product createProduct(@Name("input") ProductInput input) throws ProductNotFoundException {
         Product product = new Product(null, input.getName(), input.getPrice());
         return productService.createProduct(product);
     }
     
     @Mutation
     @RolesAllowed("Admin")
-    public Product updateProduct(@Name("id") Long id, @Name("input") ProductInput input) {
+    public Product updateProduct(@Name("id") Long id, @Name("input") ProductInput input) throws ProductNotFoundException {
         Product existing = productService.getProduct(id);
         Product updated = new Product(existing.id(), input.getName(), input.getPrice());
         return productService.updateProduct(id, updated);

@@ -25,12 +25,12 @@ public class ProductUseCase implements ProductService {
         try {
             return repository.save(product);
         } catch (Exception e){
-            throw new ProductNotFoundException(product.id());
+            throw new RuntimeException("Error creating a new product");
         }
     }
 
     @Override
-    public Product getProduct(Long id) { 
+    public Product getProduct(Long id) throws ProductNotFoundException { 
         return repository.findById(id).orElseThrow(() -> new ProductNotFoundException(id));
     }
 
@@ -40,7 +40,7 @@ public class ProductUseCase implements ProductService {
     }
 
     @Override
-    public Product updateProduct(Long id, Product product) {
+    public Product updateProduct(Long id, Product product) throws ProductNotFoundException {
         try {
             // Use the dedicated update method that preserves existing ID
             return repository.updateExisting(id, product);

@@ -224,6 +224,50 @@ public class GraphQLResourceTest {
         // Either we have GraphQL errors OR the product is null
         assertTrue(errors != null && !errors.isEmpty() || product == null);
     }
+    // Test checked exception propagation in GraphQL 
+    @Test
+    public void testCheckedExceptionPropagation() {
+        String query = """
+            {
+              product(id: 999999) {
+                id
+                name
+                price
+              }
+            }
+            """;
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("query", query);
+
+        Response response = given()
+            .contentType("application/json")
+            .body(requestBody)
+        .when()
+            .post("/graphql");
+
+        assertEquals(200, response.statusCode());
+        
+        // With checked exceptions, we should get proper GraphQL errors with meaningful messages
+        List<Map<String, Object>> errors = response.jsonPath().getList("errors");
+        Object product = response.jsonPath().get("data.product");
+        
+        // Should have errors and null product with checked exception
+        assertNotNull(errors, "Should have GraphQL errors");
+        assertFalse(errors.isEmpty(), "Should have at least one error");
+        assertNull(product, "Product should be null when not found");
+        
+        // Check the error message is not the generic "System error"
+        Map<String, Object> error = errors.get(0);
+        String errorMessage = (String) error.get("message");
+        
+        assertNotNull(errorMessage, "Error message should not be null");
+        assertNotEquals("System error", errorMessage, "Should not be generic 'System error'");
+        assertTrue(errorMessage.contains("999999") || errorMessage.contains("not found"), 
+            "Error message should contain product ID or 'not found', but got: " + errorMessage);
+    }
+
+    // Test product stats query (without mocking)
 
     // Test product stats query (without mocking)
     @Test
