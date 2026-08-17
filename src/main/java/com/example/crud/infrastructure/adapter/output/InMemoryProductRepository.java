@@ -53,6 +53,31 @@ public class InMemoryProductRepository implements ProductRepository {
     }
     
     /**
+     * Updates an existing product with new values.
+     * This method is specifically designed for updates - it preserves the existing ID.
+     * Different from save() which always creates new products with auto-incremental IDs.
+     * 
+     * @param id The existing product ID to update
+     * @param product The product data with new name and price values
+     * @return The updated product with the original ID
+     * @throws NoSuchElementException if product with the given ID doesn't exist
+     */
+    public Product updateExisting(Long id, Product product) {
+        // Verify product exists before updating
+        if (!products.containsKey(id)) {
+            throw new NoSuchElementException("Product with ID " + id + " not found");
+        }
+        
+        // Create updated product with the EXISTING ID (not auto-generated)
+        Product updatedProduct = new Product(id, product.name(), product.price());
+        
+        // Replace the existing product in memory
+        products.put(id, updatedProduct);
+        
+        return updatedProduct;
+    }
+    
+    /**
      * Clears all products from memory.
      * Useful for testing to get clean state.
      */

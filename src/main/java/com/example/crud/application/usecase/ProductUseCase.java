@@ -6,6 +6,7 @@ import com.example.crud.domain.exception.ProductNotFoundException;
 import com.example.crud.domain.model.Product;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Use case implementation for basic product CRUD operations.
@@ -40,15 +41,12 @@ public class ProductUseCase implements ProductService {
 
     @Override
     public Product updateProduct(Long id, Product product) {
-        // First verify the product exists
-        Product existing = repository.findById(id)
-            .orElseThrow(() -> new ProductNotFoundException(id));
-        
-        // Create updated product with the same ID but new values
-        Product updated = new Product(existing.id(), product.name(), product.price());
-        
-        // Save the updated product
-        return repository.save(updated);
+        try {
+            // Use the dedicated update method that preserves existing ID
+            return repository.updateExisting(id, product);
+        } catch (NoSuchElementException e) {
+            throw new ProductNotFoundException(id);
+        }
     }
 
     @Override
